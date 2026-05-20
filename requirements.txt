@@ -1,7 +1,7 @@
 streamlit
-numpy>=1.23.0
+numpy==1.26.4
 opencv-contrib-python-headless==4.8.1.78
-torch
+torch==2.2.0
 transformers
 mediapipe
 pillow
