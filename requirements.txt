@@ -3,3 +3,6 @@ opencv-python-headless
 torch
 transformers
 mediapipe
+pillow
+matplotlib
+gdown
