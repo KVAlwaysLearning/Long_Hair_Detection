@@ -1,6 +1,7 @@
 import streamlit as st
-import os
 import gdown
+import os
+os.environ["OPENCV_VIDEOIO_PRIORITY_MSMF"] = "0"
 import cv2
 import torch
 import torch.nn.functional as F
