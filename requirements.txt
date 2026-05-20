@@ -1,4 +1,4 @@
-streamlit
+streamlit>=1.20.0
 opencv-python-headless
 torch
 transformers
