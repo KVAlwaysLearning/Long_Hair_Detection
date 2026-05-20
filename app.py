@@ -1,7 +1,9 @@
+import os
+
+os.environ["OPENCV_IO_ENABLE_OPENEXR"] = "1"
+
 import streamlit as st
 import gdown
-import os
-os.environ["OPENCV_VIDEOIO_PRIORITY_MSMF"] = "0"
 import cv2
 import torch
 import torch.nn.functional as F
