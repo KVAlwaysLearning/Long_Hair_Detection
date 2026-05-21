@@ -1,3 +1,22 @@
+import streamlit as st
+import os
+import gdown
+import time
+import cv2
+import torch
+import torch.nn.functional as F
+import numpy as np
+import mediapipe as mp
+from PIL import Image
+from transformers import SegformerImageProcessor, SegformerForSemanticSegmentation, pipeline
+from mediapipe.tasks import python
+from mediapipe.tasks.python import vision
+
+# --- CONFIGURATION ---
+DRIVE_FOLDER_ID = "1xLgUm3YgyvgzaL86LD_QFYPTRkHmU_Sd"
+ROOT_DIR = os.getcwd()
+MODELS_ROOT = os.path.join(ROOT_DIR, "Models")
+
 @st.cache_resource
 def setup_environment():
     # 1. Ensure download is done
@@ -27,7 +46,7 @@ def setup_environment():
     
     proc = SegformerImageProcessor.from_pretrained(parsing_path, local_files_only=True)
     model = SegformerForSemanticSegmentation.from_pretrained(parsing_path, local_files_only=True)
-    
+
     landmarker = vision.FaceLandmarker.create_from_options(
         vision.FaceLandmarkerOptions(base_options=python.BaseOptions(model_asset_path=os.path.join(model_files_dir, "face_landmarker.task")), num_faces=1)
     )
