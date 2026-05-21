@@ -1,41 +1,32 @@
-import streamlit as st
-import os
-import gdown
-import time
-import cv2
-import torch
-import torch.nn.functional as F
-import numpy as np
-import mediapipe as mp
-from PIL import Image
-from transformers import SegformerImageProcessor, SegformerForSemanticSegmentation, pipeline
-from mediapipe.tasks import python
-from mediapipe.tasks.python import vision
-
-# --- CONFIGURATION ---
-DRIVE_FOLDER_ID = "1xLgUm3YgyvgzaL86LD_QFYPTRkHmU_Sd"
-ROOT_DIR = os.getcwd()
-MODELS_ROOT = os.path.join(ROOT_DIR, "Models")
-
 @st.cache_resource
 def setup_environment():
-    # 1. Download
+    # 1. Ensure download is done
     if not os.path.exists(MODELS_ROOT):
         with st.spinner("Downloading models..."):
             gdown.download_folder(id=DRIVE_FOLDER_ID, output=MODELS_ROOT, quiet=False)
             time.sleep(5)
 
-    # 2. Path Correction: gdown often adds the Drive folder name as a subfolder
-    # We list contents to find the real path dynamically
-    subfolders = [f.path for f in os.scandir(MODELS_ROOT) if f.is_dir()]
-    real_models_root = subfolders[0] if subfolders else MODELS_ROOT
+    # 2. DYNAMIC PATH DISCOVERY
+    # This finds the actual path where hf_models is located, 
+    # regardless of how many nested folders gdown created.
+    hf_root = None
+    model_files_dir = None
     
-    hf_root = os.path.join(real_models_root, "hf_models")
-    model_files_dir = os.path.join(real_models_root, "model_files")
+    for root, dirs, files in os.walk(MODELS_ROOT):
+        if "hf_models" in dirs and hf_root is None:
+            hf_root = os.path.join(root, "hf_models")
+        if "model_files" in dirs and model_files_dir is None:
+            model_files_dir = os.path.join(root, "model_files")
+            
+    if not hf_root or not model_files_dir:
+        st.error(f"Could not find model subfolders. Found: {list(os.walk(MODELS_ROOT))}")
+        return None
+
+    # 3. Load Models using the found paths
+    parsing_path = os.path.join(hf_root, "face-parsing")
     
-    # 3. Load Models
-    proc = SegformerImageProcessor.from_pretrained(os.path.join(hf_root, "face-parsing"), local_files_only=True)
-    model = SegformerForSemanticSegmentation.from_pretrained(os.path.join(hf_root, "face-parsing"), local_files_only=True)
+    proc = SegformerImageProcessor.from_pretrained(parsing_path, local_files_only=True)
+    model = SegformerForSemanticSegmentation.from_pretrained(parsing_path, local_files_only=True)
     
     landmarker = vision.FaceLandmarker.create_from_options(
         vision.FaceLandmarkerOptions(base_options=python.BaseOptions(model_asset_path=os.path.join(model_files_dir, "face_landmarker.task")), num_faces=1)
