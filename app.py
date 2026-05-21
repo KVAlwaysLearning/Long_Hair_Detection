@@ -122,7 +122,7 @@ def run_analysis(image_file, proc, p_model, land, age_p, gen_p, det):
     }
 
 # UI Layout
-st.title("✨ AI Face Analysis Studio")
+st.title("✨ Long Hair Detection with Age & Conditional Gender")
 st.write("---")
 
 col1, col2 = st.columns([1, 1])
